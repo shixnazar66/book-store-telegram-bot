@@ -8,15 +8,9 @@ import {
 } from "@grammyjs/conversations";
 import { env } from "./config/env.config";
 import axios from "axios";
-import { emit } from "process";
-import { error } from "console";
+
 
 const token = env.BOT_TOKEN;
-
-// const bot = new Bot(token);
-
-
-
 
 
 
@@ -87,7 +81,6 @@ bot.command("registratsiya", async (ctx) => {
   .catch(error => {
      ctx.conversation.enter('addquestion')
   })
-  
 })
 
 
@@ -108,22 +101,40 @@ bot.command("start", async (ctx) => {
 
 
 
-bot.on('message',async (ctx) => {
-const text = ctx.message?.text
-axios.put("http://localhost:3000/book/bookfind",{bookname:text})
+bot.use(createConversation(findbook))
+export async function findbook(
+  conversation: MyConversation,
+  ctx: MyContext
+) {
+  ctx.reply("kitob nomini yozing");
+  const kitob = await conversation.form.text();
+ axios.put("http://localhost:3000/book/bookfind",{bookname:kitob})
 .then(req => {
 ctx.reply(`bookname ° ${req.data.bookname}
 author ° ${req.data.author}
 booklanguage ° ${req.data.booklanguage}
-money ° ${req.data.money}`)
+money ° ${req.data.money}
+
+(yana qidirish uchun find buyrugidan foydalaning)`)
 })
 .catch(error => {
-ctx.reply('bunday kitob majvud emas');
+ctx.reply(`bunday kitob majvud emas
+
+(yana qidirish uchun find buyrugidan foydalaning)`);
  })
+}
+
+
+bot.command('find',async (ctx) => {
+  ctx.conversation.enter('findbook')
 })
 
 
 
+
+bot.on('message', async (ctx) => {
+  ctx.reply('bingo')
+})
 
 
 

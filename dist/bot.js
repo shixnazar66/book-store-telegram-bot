@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addQuestion = void 0;
+exports.findbook = exports.addQuestion = void 0;
 const grammy_1 = require("grammy");
 const grammy = __importStar(require("grammy"));
 const conversations_1 = require("@grammyjs/conversations");
@@ -100,18 +100,32 @@ bot.command("start", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
         ctx.reply('avval registratsiyadan oting');
     });
 }));
-bot.on('message', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    const text = (_c = ctx.message) === null || _c === void 0 ? void 0 : _c.text;
-    axios_1.default.put("http://localhost:3000/book/bookfind", { bookname: text })
-        .then(req => {
-        ctx.reply(`bookname ° ${req.data.bookname}
+bot.use((0, conversations_1.createConversation)(findbook));
+function findbook(conversation, ctx) {
+    return __awaiter(this, void 0, void 0, function* () {
+        ctx.reply("kitob nomini yozing");
+        const kitob = yield conversation.form.text();
+        axios_1.default.put("http://localhost:3000/book/bookfind", { bookname: kitob })
+            .then(req => {
+            ctx.reply(`bookname ° ${req.data.bookname}
 author ° ${req.data.author}
 booklanguage ° ${req.data.booklanguage}
-money ° ${req.data.money}`);
-    })
-        .catch(error => {
-        ctx.reply('bunday kitob majvud emas');
+money ° ${req.data.money}
+
+(yana qidirish uchun find buyrugidan foydalaning)`);
+        })
+            .catch(error => {
+            ctx.reply(`bunday kitob majvud emas
+
+(yana qidirish uchun find buyrugidan foydalaning)`);
+        });
     });
+}
+exports.findbook = findbook;
+bot.command('find', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    ctx.conversation.enter('findbook');
+}));
+bot.on('message', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    ctx.reply('bingo');
 }));
 bot.start();
