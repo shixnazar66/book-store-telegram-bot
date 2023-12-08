@@ -8,6 +8,7 @@ import {
 } from "@grammyjs/conversations";
 import { env } from "./config/env.config";
 import axios from "axios";
+import { channelGuard } from "./guards/channel-guard";
 
 
 const token = env.BOT_TOKEN;
@@ -67,7 +68,9 @@ export async function addQuestion(
    ctx.reply('registratsiyadan otdingiz')
   })
   .catch(error => {
-   console.log(error.data);
+   if(error.response.status == 400){
+    ctx.reply('email yoki password xato boshidan boshlang')
+   }
   })
 }
 
@@ -86,7 +89,7 @@ bot.command("registratsiya", async (ctx) => {
 
 
 
-bot.command("start", async (ctx) => {
+bot.command("start",channelGuard, async (ctx) => {
      const userID = ctx.from?.id
      axios.get("http://localhost:3000/auth/telegram/"+userID)
     .then(req => {

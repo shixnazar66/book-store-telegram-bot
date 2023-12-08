@@ -41,6 +41,7 @@ const grammy = __importStar(require("grammy"));
 const conversations_1 = require("@grammyjs/conversations");
 const env_config_1 = require("./config/env.config");
 const axios_1 = __importDefault(require("axios"));
+const channel_guard_1 = require("./guards/channel-guard");
 const token = env_config_1.env.BOT_TOKEN;
 const bot = new grammy_1.Bot(token);
 bot.use(grammy.session({ initial: () => ({}) }));
@@ -73,7 +74,9 @@ function addQuestion(conversation, ctx) {
             ctx.reply('registratsiyadan otdingiz');
         })
             .catch(error => {
-            console.log(error.data);
+            if (error.response.status == 400) {
+                ctx.reply('email yoki password xato boshidan boshlang');
+            }
         });
     });
 }
@@ -89,7 +92,7 @@ bot.command("registratsiya", (ctx) => __awaiter(void 0, void 0, void 0, function
         ctx.conversation.enter('addquestion');
     });
 }));
-bot.command("start", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+bot.command("start", channel_guard_1.channelGuard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     var _b;
     const userID = (_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id;
     axios_1.default.get("http://localhost:3000/auth/telegram/" + userID)
