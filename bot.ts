@@ -108,14 +108,17 @@ export async function findbook(
 ) {
   ctx.reply("kitob nomini yozing");
   const kitob = await conversation.form.text();
+  const keyboard = new InlineKeyboard()
+  .text('sotib olish ✅','buy').row()
  axios.put("http://localhost:3000/book/bookfind",{bookname:kitob})
 .then(req => {
 ctx.reply(`bookname ° ${req.data.bookname}
 author ° ${req.data.author}
 booklanguage ° ${req.data.booklanguage}
-money ° ${req.data.money}
+money ° ${req.data.money} som
 
-(yana qidirish uchun find buyrugidan foydalaning)`)
+(yana qidirish uchun find buyrugidan foydalaning)`,
+{reply_markup:keyboard})
 })
 .catch(error => {
 ctx.reply(`bunday kitob majvud emas
