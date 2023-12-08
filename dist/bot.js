@@ -130,6 +130,42 @@ exports.findbook = findbook;
 bot.command('find', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.conversation.enter('findbook');
 }));
+bot.command('category', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const request = yield axios_1.default.get("http://localhost:3000/category/findcategory");
+        const jv = request.data;
+        const names = jv.map(obj => obj.categoryname);
+        for (let str of names) {
+            const keyboard = new grammy_1.InlineKeyboard()
+                .text(`${str}`).row();
+            ctx.reply(`categoryni tanlang`, { reply_markup: keyboard });
+        }
+    }
+    catch (error) {
+        throw error;
+    }
+}));
+bot.on('callback_query:data', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    const str = ctx.callbackQuery.data;
+    yield axios_1.default.post("http://localhost:3000/category/findcat", { categoryname: str })
+        .then(req => {
+        const jv = req.data;
+        for (let obj of jv.book) {
+            const keyboard = new grammy_1.InlineKeyboard()
+                .text('sotib olish ✅', 'buy').row();
+            ctx.reply(`${str} (categoriyasidagi kitob)
+
+bookname ° ${obj.bookname}
+author ° ${obj.author}
+booklanguage ° ${obj.booklanguage}
+money ° ${obj.money} som`, { reply_markup: keyboard });
+        }
+    })
+        .catch(error => {
+        console.log(error);
+        ctx.reply('bunday categorya topilmadi');
+    });
+}));
 bot.on('message', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.reply('bingo');
 }));
