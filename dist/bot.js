@@ -51,13 +51,13 @@ function addQuestion(conversation, ctx) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const userID = (_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id;
-        ctx.reply("ismingizni yozing");
+        ctx.reply("ismingizni yozing ✒️");
         const name = yield conversation.form.text();
-        ctx.reply("familyangizni yozing");
+        ctx.reply("familyangizni yozing 🖋️");
         const lastname = yield conversation.form.text();
-        ctx.reply("parolingizni yozing");
+        ctx.reply("parolingizni yozing 🔏");
         const password = yield conversation.form.text();
-        ctx.reply('emailingizni yozing');
+        ctx.reply('emailingizni yozing 🖊️');
         const email = yield conversation.form.text();
         const jv = {
             firstname: name,
@@ -71,11 +71,12 @@ function addQuestion(conversation, ctx) {
         };
         yield axios_1.default.put("http://localhost:3000/auth/register", jv, { headers })
             .then(req => {
-            ctx.reply('registratsiyadan otdingiz');
+            ctx.reply('registratsiyadan otdingiz tabriklayman ✅');
         })
             .catch(error => {
             if (error.response.status == 400) {
-                ctx.reply('email yoki password xato boshidan boshlang /registratsiya');
+                ctx.reply(`email yoki password xato ❌ 
+    boshidan boshlang /registratsiya`);
             }
         });
     });
@@ -86,7 +87,7 @@ bot.command("registratsiya", (ctx) => __awaiter(void 0, void 0, void 0, function
     const userID = (_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id;
     axios_1.default.get("http://localhost:3000/auth/telegram/" + userID)
         .then(req => {
-        ctx.reply('siz allaqachon registratsiyadan otgansiz');
+        ctx.reply('siz allaqachon registratsiyadan otgansiz ✅');
     })
         .catch(error => {
         ctx.conversation.enter('addquestion');
@@ -97,7 +98,7 @@ bot.command("start", channel_guard_1.channelGuard, (ctx) => __awaiter(void 0, vo
     const userID = (_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id;
     axios_1.default.get("http://localhost:3000/auth/telegram/" + userID)
         .then(req => {
-        ctx.reply('bingo');
+        ctx.reply('welcome 👀');
     })
         .catch(error => {
         ctx.reply('avval registratsiyadan oting /registratsiya');
@@ -106,7 +107,7 @@ bot.command("start", channel_guard_1.channelGuard, (ctx) => __awaiter(void 0, vo
 bot.use((0, conversations_1.createConversation)(findbook));
 function findbook(conversation, ctx) {
     return __awaiter(this, void 0, void 0, function* () {
-        ctx.reply("kitob nomini yozing");
+        ctx.reply("kitob nomini yozing ✒️");
         const kitob = yield conversation.form.text();
         const keyboard = new grammy_1.InlineKeyboard()
             .text('sotib olish ✅', 'buy').row();
@@ -120,7 +121,7 @@ money ° ${req.data.money} som
 (yana qidirish uchun /find buyrugidan foydalaning)`, { reply_markup: keyboard });
         })
             .catch(error => {
-            ctx.reply(`bunday kitob majvud emas
+            ctx.reply(`bunday kitob majvud emas ❌
 
 (yana qidirish uchun /find buyrugidan foydalaning)`);
         });
@@ -138,7 +139,7 @@ bot.command('category', (ctx) => __awaiter(void 0, void 0, void 0, function* () 
         for (let str of names) {
             const keyboard = new grammy_1.InlineKeyboard()
                 .text(`${str}`).row();
-            ctx.reply(`categoryni tanlang`, { reply_markup: keyboard });
+            ctx.reply(`categoryni tanlang 📌`, { reply_markup: keyboard });
         }
     }
     catch (error) {
@@ -163,8 +164,17 @@ money ° ${obj.money} som`, { reply_markup: keyboard });
     })
         .catch(error => {
         console.log(error);
-        ctx.reply('bunday categorya topilmadi');
+        ctx.reply('bunday categorya topilmadi ❌');
     });
+}));
+bot.command('help', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    ctx.reply(`nima qilishni hohlaysiz?
+  
+registratsiyadan otish uchun bosing -> /registratsiya
+kitoblarni topish uchun bosing -> /find
+categoryni topish uchun bosing -> /category
+-------------------------------------------------------------------------------
+                                    omad ✅`);
 }));
 bot.on('message', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.reply('bingo');

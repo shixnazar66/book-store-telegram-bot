@@ -35,19 +35,19 @@ export async function addQuestion(
 
   const userID = ctx.from?.id
 
-  ctx.reply("ismingizni yozing");
+  ctx.reply("ismingizni yozing ✒️");
   const name = await conversation.form.text();
 
 
-  ctx.reply("familyangizni yozing");
+  ctx.reply("familyangizni yozing 🖋️");
   const lastname = await conversation.form.text();
 
 
-  ctx.reply("parolingizni yozing");
+  ctx.reply("parolingizni yozing 🔏");
   const password = await conversation.form.text();
 
-
-  ctx.reply('emailingizni yozing')
+ 
+  ctx.reply('emailingizni yozing 🖊️')
   const email = await conversation.form.text()
 
 
@@ -66,11 +66,12 @@ export async function addQuestion(
 
   await axios.put("http://localhost:3000/auth/register",jv,{headers})
   .then(req => {
-   ctx.reply('registratsiyadan otdingiz')
+   ctx.reply('registratsiyadan otdingiz tabriklayman ✅')
   })
   .catch(error => {
    if(error.response.status == 400){
-    ctx.reply('email yoki password xato boshidan boshlang /registratsiya')
+    ctx.reply(`email yoki password xato ❌ 
+    boshidan boshlang /registratsiya`)
    }
   })
 }
@@ -80,7 +81,7 @@ bot.command("registratsiya", async (ctx) => {
    const userID = ctx.from?.id
    axios.get("http://localhost:3000/auth/telegram/"+userID)
   .then(req => {
-   ctx.reply('siz allaqachon registratsiyadan otgansiz')
+   ctx.reply('siz allaqachon registratsiyadan otgansiz ✅')
   })
   .catch(error => {
      ctx.conversation.enter('addquestion')
@@ -94,7 +95,7 @@ bot.command("start",channelGuard, async (ctx) => {
      const userID = ctx.from?.id
      axios.get("http://localhost:3000/auth/telegram/"+userID)
     .then(req => {
-     ctx.reply('bingo')
+     ctx.reply('welcome 👀')
     })
     .catch(error => {
       ctx.reply('avval registratsiyadan oting /registratsiya')
@@ -110,7 +111,7 @@ export async function findbook(
   conversation: MyConversation,
   ctx: MyContext
 ) {
-  ctx.reply("kitob nomini yozing");
+  ctx.reply("kitob nomini yozing ✒️");
   const kitob = await conversation.form.text();
   const keyboard = new InlineKeyboard()
   .text('sotib olish ✅','buy').row()
@@ -125,7 +126,7 @@ money ° ${req.data.money} som
 {reply_markup:keyboard})
 })
 .catch(error => {
-ctx.reply(`bunday kitob majvud emas
+ctx.reply(`bunday kitob majvud emas ❌
 
 (yana qidirish uchun /find buyrugidan foydalaning)`);
  })
@@ -145,14 +146,14 @@ bot.command('category',async (ctx) => {
    for (let str of names){
    const keyboard = new InlineKeyboard()
    .text(`${str}`).row()
-   ctx.reply(`categoryni tanlang`, { reply_markup: keyboard });
+   ctx.reply(`categoryni tanlang 📌`, { reply_markup: keyboard });
    }
   } catch (error) {
     throw error
   }
 })
 
-
+ 
 
 bot.on('callback_query:data',async (ctx) => {
 const str = ctx.callbackQuery.data
@@ -172,12 +173,22 @@ money ° ${obj.money} som`,{reply_markup:keyboard})
 })
 .catch(error => {
   console.log(error); 
-  ctx.reply('bunday categorya topilmadi')
+  ctx.reply('bunday categorya topilmadi ❌')
  })
 })
 
 
 
+
+bot.command('help',async (ctx) => {
+ctx.reply(`nima qilishni hohlaysiz?
+  
+registratsiyadan otish uchun bosing -> /registratsiya
+kitoblarni topish uchun bosing -> /find
+categoryni topish uchun bosing -> /category
+-------------------------------------------------------------------------------
+                                    omad ✅`)
+})
 
 
 
