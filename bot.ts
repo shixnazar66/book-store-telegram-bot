@@ -70,7 +70,7 @@ export async function addQuestion(
   })
   .catch(error => {
    if(error.response.status == 400){
-    ctx.reply('email yoki password xato boshidan boshlang')
+    ctx.reply('email yoki password xato boshidan boshlang /registratsiya')
    }
   })
 }
@@ -97,7 +97,7 @@ bot.command("start",channelGuard, async (ctx) => {
      ctx.reply('bingo')
     })
     .catch(error => {
-      ctx.reply('avval registratsiyadan oting')
+      ctx.reply('avval registratsiyadan oting /registratsiya')
     })
 });
 
@@ -121,13 +121,13 @@ author ° ${req.data.author}
 booklanguage ° ${req.data.booklanguage}
 money ° ${req.data.money} som
 
-(yana qidirish uchun find buyrugidan foydalaning)`,
+(yana qidirish uchun /find buyrugidan foydalaning)`,
 {reply_markup:keyboard})
 })
 .catch(error => {
 ctx.reply(`bunday kitob majvud emas
 
-(yana qidirish uchun find buyrugidan foydalaning)`);
+(yana qidirish uchun /find buyrugidan foydalaning)`);
  })
 }
 
