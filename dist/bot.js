@@ -98,10 +98,36 @@ bot.command("start", channel_guard_1.channelGuard, (ctx) => __awaiter(void 0, vo
     const userID = (_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id;
     axios_1.default.get("http://localhost:3000/auth/telegram/" + userID)
         .then(req => {
-        ctx.reply('welcome 👀');
+        ctx.reply(`welcome 👀
+      ------------------------------------------------------------   
+                     nima qilishni hohlaysiz?
+      ------------------------------------------------------------
+registratsiyadan otish uchun -> /registratsiya
+kitoblarni topish uchun -> /find
+categoryni topish uchun -> /category
+       ------------------------------------------------------------
+                                 omad ✅`);
     })
         .catch(error => {
         ctx.reply('avval registratsiyadan oting /registratsiya');
+    });
+}));
+bot.command('me', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
+    const id = (_c = ctx.from) === null || _c === void 0 ? void 0 : _c.id;
+    axios_1.default.get("http://localhost:3000/auth/saved/" + id)
+        .then(req => {
+        const book = req.data.book;
+        const keyboard = new grammy_1.InlineKeyboard()
+            .text('sotib olish 💸', `buy ${book.id}`).row();
+        ctx.reply(`sizning saqlagan kitobingiz ✅
+          ------------------------
+bookname ° ${book.bookname}
+author ° ${book.author}
+booklanguage ° ${book.booklanguage}
+money ° ${book.money} som`, { reply_markup: keyboard });
+    })
+        .catch(error => {
     });
 }));
 bot.use((0, conversations_1.createConversation)(findbook));
@@ -109,10 +135,10 @@ function findbook(conversation, ctx) {
     return __awaiter(this, void 0, void 0, function* () {
         ctx.reply("kitob nomini yozing ✒️");
         const kitob = yield conversation.form.text();
-        const keyboard = new grammy_1.InlineKeyboard()
-            .text('sotib olish ✅', 'buy').row();
         axios_1.default.put("http://localhost:3000/book/bookfind", { bookname: kitob })
             .then(req => {
+            const keyboard = new grammy_1.InlineKeyboard()
+                .text('sotib olish 💸', `buy ${req.data.id}`).row();
             ctx.reply(`bookname ° ${req.data.bookname}
 author ° ${req.data.author}
 booklanguage ° ${req.data.booklanguage}
@@ -131,16 +157,32 @@ exports.findbook = findbook;
 bot.command('find', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.conversation.enter('findbook');
 }));
+bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const arr = ctx.callbackQuery.data;
+    if (arr.split(" ")[0] == 'buy') {
+        const str = arr.split(" ")[1];
+        axios_1.default.get("http://localhost:3000/book/buy/" + str)
+            .then(req => {
+            ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`);
+        })
+            .catch(error => {
+            console.log('error');
+        });
+    }
+    else {
+        next();
+    }
+}));
 bot.command('category', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const request = yield axios_1.default.get("http://localhost:3000/category/findcategory");
         const jv = request.data;
         const names = jv.map(obj => obj.categoryname);
+        const keyboard = new grammy_1.InlineKeyboard();
         for (let str of names) {
-            const keyboard = new grammy_1.InlineKeyboard()
-                .text(`${str}`).row();
-            ctx.reply(`categoryni tanlang 📌`, { reply_markup: keyboard });
+            keyboard.text(`${str}`).row();
         }
+        ctx.reply(`categoryni tanlang 📌`, { reply_markup: keyboard });
     }
     catch (error) {
         throw error;
@@ -153,13 +195,13 @@ bot.on('callback_query:data', (ctx) => __awaiter(void 0, void 0, void 0, functio
         const jv = req.data;
         for (let obj of jv.book) {
             const keyboard = new grammy_1.InlineKeyboard()
-                .text('sotib olish ✅', 'buy').row();
+                .text('sotib olish 💸', `buy ${obj.id}`).row();
             ctx.reply(`${str} (categoriyasidagi kitob)
 
-bookname ° ${obj.bookname}
-author ° ${obj.author}
-booklanguage ° ${obj.booklanguage}
-money ° ${obj.money} som`, { reply_markup: keyboard });
+bookname: ${obj.bookname}
+author: ${obj.author}
+booklanguage: ${obj.booklanguage}
+money: ${obj.money} som`, { reply_markup: keyboard });
         }
     })
         .catch(error => {
@@ -168,13 +210,14 @@ money ° ${obj.money} som`, { reply_markup: keyboard });
     });
 }));
 bot.command('help', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    ctx.reply(`nima qilishni hohlaysiz?
-  
-registratsiyadan otish uchun bosing -> /registratsiya
-kitoblarni topish uchun bosing -> /find
-categoryni topish uchun bosing -> /category
--------------------------------------------------------------------------------
-                                    omad ✅`);
+    ctx.reply(`  
+                 nima qilishni hohlaysiz?
+  ------------------------------------------------------------
+registratsiyadan otish uchun -> /registratsiya
+kitoblarni topish uchun -> /find
+categoryni topish uchun -> /category
+   ------------------------------------------------------------
+                             omad ✅`);
 }));
 bot.on('message', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.reply('bingo');

@@ -9,7 +9,6 @@ import {
 import { env } from "./config/env.config";
 import axios from "axios";
 import { channelGuard } from "./guards/channel-guard";
-import { error } from "console";
 
 
 const token = env.BOT_TOKEN;
@@ -95,13 +94,42 @@ bot.command("start",channelGuard, async (ctx) => {
      const userID = ctx.from?.id
      axios.get("http://localhost:3000/auth/telegram/"+userID)
     .then(req => {
-     ctx.reply('welcome 👀')
+    ctx.reply(`welcome 👀
+      ------------------------------------------------------------   
+                     nima qilishni hohlaysiz?
+      ------------------------------------------------------------
+registratsiyadan otish uchun -> /registratsiya
+kitoblarni topish uchun -> /find
+categoryni topish uchun -> /category
+       ------------------------------------------------------------
+                                 omad ✅`)
     })
     .catch(error => {
       ctx.reply('avval registratsiyadan oting /registratsiya')
     })
 });
 
+
+
+bot.command('me',async (ctx) => {
+  const id = ctx.from?.id
+  axios.get("http://localhost:3000/auth/saved/"+id)
+  .then(req => {
+const book = req.data.book
+const keyboard = new InlineKeyboard()
+.text('sotib olish 💸',`buy ${book.id}`).row()
+ctx.reply(`sizning saqlagan kitobingiz ✅
+          ------------------------
+bookname ° ${book.bookname}
+author ° ${book.author}
+booklanguage ° ${book.booklanguage}
+money ° ${book.money} som`,
+{reply_markup:keyboard})
+  })
+  .catch(error => {
+     
+  })
+})
 
 
 
@@ -113,10 +141,10 @@ export async function findbook(
 ) {
   ctx.reply("kitob nomini yozing ✒️");
   const kitob = await conversation.form.text();
-  const keyboard = new InlineKeyboard()
-  .text('sotib olish ✅','buy').row()
  axios.put("http://localhost:3000/book/bookfind",{bookname:kitob})
 .then(req => {
+const keyboard = new InlineKeyboard()
+.text('sotib olish 💸',`buy ${req.data.id}`).row()
 ctx.reply(`bookname ° ${req.data.bookname}
 author ° ${req.data.author}
 booklanguage ° ${req.data.booklanguage}
@@ -124,7 +152,7 @@ money ° ${req.data.money} som
 
 (yana qidirish uchun /find buyrugidan foydalaning)`,
 {reply_markup:keyboard})
-})
+}) 
 .catch(error => {
 ctx.reply(`bunday kitob majvud emas ❌
 
@@ -136,6 +164,28 @@ ctx.reply(`bunday kitob majvud emas ❌
 bot.command('find',async (ctx) => {
   ctx.conversation.enter('findbook')
 })
+ 
+
+
+
+bot.on('callback_query:data',async (ctx,next) => {
+  const arr = ctx.callbackQuery.data
+  if(arr.split(" ")[0] == 'buy'){
+  const str = arr.split(" ")[1]
+  axios.get("http://localhost:3000/book/buy/"+str)
+  .then(req =>{
+  ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`)
+  })     
+  .catch(error => {
+    console.log('error');
+  }) 
+  }else{
+    next()
+  }
+})
+
+
+
 
 
 bot.command('category',async (ctx) => {
@@ -143,17 +193,17 @@ bot.command('category',async (ctx) => {
    const request = await axios.get("http://localhost:3000/category/findcategory")
    const jv:{categoryname:string}[] = request.data
    const names: string[] = jv.map(obj => obj.categoryname);
-   for (let str of names){
    const keyboard = new InlineKeyboard()
-   .text(`${str}`).row()
-   ctx.reply(`categoryni tanlang 📌`, { reply_markup: keyboard });
-   }
+   for (let str of names){
+   keyboard.text(`${str}`).row()
+  }
+  ctx.reply(`categoryni tanlang 📌`, { reply_markup: keyboard });
   } catch (error) {
     throw error
   }
 })
 
- 
+  
 
 bot.on('callback_query:data',async (ctx) => {
 const str = ctx.callbackQuery.data
@@ -162,13 +212,13 @@ await axios.post("http://localhost:3000/category/findcat",{categoryname:str})
 const jv = req.data
 for (let obj of jv.book){
 const keyboard = new InlineKeyboard()
-.text('sotib olish ✅','buy').row()
+.text('sotib olish 💸',`buy ${obj.id}`).row()
 ctx.reply(`${str} (categoriyasidagi kitob)
 
-bookname ° ${obj.bookname}
-author ° ${obj.author}
-booklanguage ° ${obj.booklanguage}
-money ° ${obj.money} som`,{reply_markup:keyboard})
+bookname: ${obj.bookname}
+author: ${obj.author}
+booklanguage: ${obj.booklanguage}
+money: ${obj.money} som`,{reply_markup:keyboard})
 }
 })
 .catch(error => {
@@ -181,13 +231,14 @@ money ° ${obj.money} som`,{reply_markup:keyboard})
 
 
 bot.command('help',async (ctx) => {
-ctx.reply(`nima qilishni hohlaysiz?
-  
-registratsiyadan otish uchun bosing -> /registratsiya
-kitoblarni topish uchun bosing -> /find
-categoryni topish uchun bosing -> /category
--------------------------------------------------------------------------------
-                                    omad ✅`)
+  ctx.reply(`  
+                 nima qilishni hohlaysiz?
+  ------------------------------------------------------------
+registratsiyadan otish uchun -> /registratsiya
+kitoblarni topish uchun -> /find
+categoryni topish uchun -> /category
+   ------------------------------------------------------------
+                             omad ✅`)
 })
 
 
