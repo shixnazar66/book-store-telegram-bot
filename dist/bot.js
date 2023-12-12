@@ -76,7 +76,7 @@ function addQuestion(conversation, ctx) {
             .catch(error => {
             if (error.response.status == 400) {
                 ctx.reply(`email yoki password xato ❌ 
-    boshidan boshlang /registratsiya`);
+  boshidan boshlang /registratsiya`);
             }
         });
     });
@@ -117,7 +117,7 @@ bot.command('me', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     const id = (_c = ctx.from) === null || _c === void 0 ? void 0 : _c.id;
     axios_1.default.get("http://localhost:3000/auth/saved/" + id)
         .then(req => {
-        const book = req.data.book;
+        const book = req.data;
         const keyboard = new grammy_1.InlineKeyboard()
             .text('sotib olish 💸', `buy ${book.id}`).row();
         ctx.reply(`sizning saqlagan kitobingiz ✅
@@ -128,6 +128,7 @@ booklanguage ° ${book.booklanguage}
 money ° ${book.money} som`, { reply_markup: keyboard });
     })
         .catch(error => {
+        ctx.reply('siz xali hechnarsa saqlamagansiz ❌');
     });
 }));
 bot.use((0, conversations_1.createConversation)(findbook));
@@ -216,6 +217,7 @@ bot.command('help', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
 registratsiyadan otish uchun -> /registratsiya
 kitoblarni topish uchun -> /find
 categoryni topish uchun -> /category
+saqlangan kitoblarni korish -> /me
    ------------------------------------------------------------
                              omad ✅`);
 }));

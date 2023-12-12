@@ -70,7 +70,7 @@ export async function addQuestion(
   .catch(error => {
    if(error.response.status == 400){
     ctx.reply(`email yoki password xato ❌ 
-    boshidan boshlang /registratsiya`)
+  boshidan boshlang /registratsiya`)
    }
   })
 }
@@ -115,7 +115,7 @@ bot.command('me',async (ctx) => {
   const id = ctx.from?.id
   axios.get("http://localhost:3000/auth/saved/"+id)
   .then(req => {
-const book = req.data.book
+const book = req.data
 const keyboard = new InlineKeyboard()
 .text('sotib olish 💸',`buy ${book.id}`).row()
 ctx.reply(`sizning saqlagan kitobingiz ✅
@@ -126,8 +126,8 @@ booklanguage ° ${book.booklanguage}
 money ° ${book.money} som`,
 {reply_markup:keyboard})
   })
-  .catch(error => {
-     
+  .catch(error => { 
+     ctx.reply('siz xali hechnarsa saqlamagansiz ❌')
   })
 })
 
@@ -237,6 +237,7 @@ bot.command('help',async (ctx) => {
 registratsiyadan otish uchun -> /registratsiya
 kitoblarni topish uchun -> /find
 categoryni topish uchun -> /category
+saqlangan kitoblarni korish -> /me
    ------------------------------------------------------------
                              omad ✅`)
 })
