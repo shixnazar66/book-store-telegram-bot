@@ -118,14 +118,16 @@ bot.command('me', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     axios_1.default.get("http://localhost:3000/auth/saved/" + id)
         .then(req => {
         const book = req.data;
-        const keyboard = new grammy_1.InlineKeyboard()
-            .text('sotib olish 💸', `buy ${book.id}`).row();
-        ctx.reply(`sizning saqlagan kitobingiz ✅
+        for (let str of book) {
+            const keyboard = new grammy_1.InlineKeyboard()
+                .text('sotib olish 💸', `buy ${str.id}`).row();
+            ctx.reply(`sizning saqlagan kitobingiz ✅
           ------------------------
-bookname ° ${book.bookname}
-author ° ${book.author}
-booklanguage ° ${book.booklanguage}
-money ° ${book.money} som`, { reply_markup: keyboard });
+bookname ° ${str.bookname}
+author ° ${str.author}
+booklanguage ° ${str.booklanguage}
+money ° ${str.money} som`, { reply_markup: keyboard });
+        }
     })
         .catch(error => {
         ctx.reply('siz xali hechnarsa saqlamagansiz ❌');
@@ -139,7 +141,7 @@ function findbook(conversation, ctx) {
         axios_1.default.put("http://localhost:3000/book/bookfind", { bookname: kitob })
             .then(req => {
             const keyboard = new grammy_1.InlineKeyboard()
-                .text('sotib olish 💸', `buy ${req.data.id}`).row();
+                .text('sotib olish 💸', `buy ${req.data.id}`).text('saqlash ✅', `save ${req.data.id}`).row();
             ctx.reply(`bookname ° ${req.data.bookname}
 author ° ${req.data.author}
 booklanguage ° ${req.data.booklanguage}
@@ -170,6 +172,27 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
             console.log('error');
         });
     }
+    else if (arr.split(" ")[0] == 'save') {
+        const bookid = arr.split(" ")[1];
+        const telegramid = ctx.from.id;
+        const finduser = yield axios_1.default.get("http://localhost:3000/auth/telegram/" + telegramid);
+        if (!finduser) {
+            ctx.reply('avval registratsiyadan oting /registratsiya');
+        }
+        const userid = finduser.data.id;
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        axios_1.default.post("http://localhost:3000/saved", { userid: userid, bookid: bookid }, { headers })
+            .then(req => {
+            console.log(req.data);
+            ctx.reply(`tabriklaymiz siz saqladingiz ✅`);
+        })
+            .catch(error => {
+            console.log(error.data);
+            console.log('error');
+        });
+    }
     else {
         next();
     }
@@ -190,26 +213,49 @@ bot.command('category', (ctx) => __awaiter(void 0, void 0, void 0, function* () 
     }
 }));
 bot.on('callback_query:data', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    const str = ctx.callbackQuery.data;
-    yield axios_1.default.post("http://localhost:3000/category/findcat", { categoryname: str })
-        .then(req => {
+    try {
+        const str = ctx.callbackQuery.data;
+        const req = yield axios_1.default.post("http://localhost:3000/category/findcat", { categoryname: str });
         const jv = req.data;
-        for (let obj of jv.book) {
-            const keyboard = new grammy_1.InlineKeyboard()
-                .text('sotib olish 💸', `buy ${obj.id}`).row();
-            ctx.reply(`${str} (categoriyasidagi kitob)
-
+        if (jv.book.length <= 0) {
+            ctx.reply(`(${jv.categoryname}) categorysida kitoblar mavjud emas ❌`);
+        }
+        else {
+            for (let obj of jv.book) {
+                const keyboard = new grammy_1.InlineKeyboard()
+                    .text('sotib olish 💸', `buy ${obj.id}`).text('saqlash ✅', `save ${obj.id}`).row();
+                ctx.reply(`${str} (categoriyasidagi kitob)
+ 
 bookname: ${obj.bookname}
 author: ${obj.author}
 booklanguage: ${obj.booklanguage}
 money: ${obj.money} som`, { reply_markup: keyboard });
+            }
         }
-    })
-        .catch(error => {
+    }
+    catch (error) {
         console.log(error);
         ctx.reply('bunday categorya topilmadi ❌');
-    });
+    }
 }));
+// const str = ctx.callbackQuery.data
+// await axios.post("http://localhost:3000/category/findcat",{categoryname:str})
+// .then(req => {
+// const jv = req.data
+// for (let obj of jv.book){  
+// const keyboard = new InlineKeyboard()
+// .text('sotib olish 💸',`buy ${obj.id}`).row()
+// ctx.reply(`${str} (categoriyasidagi kitob)
+// bookname: ${obj.bookname}
+// author: ${obj.author}
+// booklanguage: ${obj.booklanguage}
+// money: ${obj.money} som`,{reply_markup:keyboard})
+// }
+// })
+// .catch(error => {
+//   console.log(error); 
+//   ctx.reply('bunday categorya topilmadi ❌')
+//  })
 bot.command('help', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.reply(`  
                  nima qilishni hohlaysiz?

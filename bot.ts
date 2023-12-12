@@ -116,15 +116,17 @@ bot.command('me',async (ctx) => {
   axios.get("http://localhost:3000/auth/saved/"+id)
   .then(req => {
 const book = req.data
+for (let str of book){
 const keyboard = new InlineKeyboard()
-.text('sotib olish 💸',`buy ${book.id}`).row()
+.text('sotib olish 💸',`buy ${str.id}`).row() 
 ctx.reply(`sizning saqlagan kitobingiz ✅
           ------------------------
-bookname ° ${book.bookname}
-author ° ${book.author}
-booklanguage ° ${book.booklanguage}
-money ° ${book.money} som`,
+bookname ° ${str.bookname}
+author ° ${str.author}
+booklanguage ° ${str.booklanguage}
+money ° ${str.money} som`,
 {reply_markup:keyboard})
+}
   })
   .catch(error => { 
      ctx.reply('siz xali hechnarsa saqlamagansiz ❌')
@@ -144,7 +146,7 @@ export async function findbook(
  axios.put("http://localhost:3000/book/bookfind",{bookname:kitob})
 .then(req => {
 const keyboard = new InlineKeyboard()
-.text('sotib olish 💸',`buy ${req.data.id}`).row()
+.text('sotib olish 💸',`buy ${req.data.id}`).text('saqlash ✅',`save ${req.data.id}`).row()
 ctx.reply(`bookname ° ${req.data.bookname}
 author ° ${req.data.author}
 booklanguage ° ${req.data.booklanguage}
@@ -179,8 +181,30 @@ bot.on('callback_query:data',async (ctx,next) => {
   .catch(error => {
     console.log('error');
   }) 
-  }else{
-    next()
+  }
+  else if(arr.split(" ")[0] == 'save'){
+    const bookid = arr.split(" ")[1]
+    const telegramid = ctx.from.id
+    const finduser = await axios.get("http://localhost:3000/auth/telegram/"+telegramid)
+    if(!finduser){
+      ctx.reply('avval registratsiyadan oting /registratsiya')
+    }
+    const userid = finduser.data.id
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    axios.post("http://localhost:3000/saved",{userid:userid,bookid:bookid},{headers})
+    .then(req =>{
+      console.log(req.data);
+    ctx.reply(`tabriklaymiz siz saqladingiz ✅`)
+    })      
+    .catch(error => {
+      console.log(error.data);
+      console.log('error');
+    }) 
+  }
+  else{
+  next()
   }
 })
 
@@ -206,26 +230,53 @@ bot.command('category',async (ctx) => {
   
 
 bot.on('callback_query:data',async (ctx) => {
+try {
 const str = ctx.callbackQuery.data
-await axios.post("http://localhost:3000/category/findcat",{categoryname:str})
-.then(req => {
+const req = await axios.post("http://localhost:3000/category/findcat",{categoryname:str})
 const jv = req.data
-for (let obj of jv.book){
+if(jv.book.length <= 0){
+  ctx.reply(`(${jv.categoryname}) categorysida kitoblar mavjud emas ❌`)
+}else{
+for (let obj of jv.book){  
 const keyboard = new InlineKeyboard()
-.text('sotib olish 💸',`buy ${obj.id}`).row()
+.text('sotib olish 💸',`buy ${obj.id}`).text('saqlash ✅',`save ${obj.id}`).row()
 ctx.reply(`${str} (categoriyasidagi kitob)
-
+ 
 bookname: ${obj.bookname}
 author: ${obj.author}
 booklanguage: ${obj.booklanguage}
 money: ${obj.money} som`,{reply_markup:keyboard})
 }
-})
-.catch(error => {
-  console.log(error); 
+ }
+  } catch (error) {
+    console.log(error); 
   ctx.reply('bunday categorya topilmadi ❌')
- })
+  }
 })
+
+
+
+// const str = ctx.callbackQuery.data
+// await axios.post("http://localhost:3000/category/findcat",{categoryname:str})
+// .then(req => {
+// const jv = req.data
+// for (let obj of jv.book){  
+// const keyboard = new InlineKeyboard()
+// .text('sotib olish 💸',`buy ${obj.id}`).row()
+// ctx.reply(`${str} (categoriyasidagi kitob)
+ 
+// bookname: ${obj.bookname}
+// author: ${obj.author}
+// booklanguage: ${obj.booklanguage}
+// money: ${obj.money} som`,{reply_markup:keyboard})
+// }
+// })
+// .catch(error => {
+//   console.log(error); 
+//   ctx.reply('bunday categorya topilmadi ❌')
+//  })
+
+
 
 
 
