@@ -190,17 +190,23 @@ bot.on('callback_query:data',async (ctx,next) => {
       ctx.reply('avval registratsiyadan oting /registratsiya')
     }
     const userid = finduser.data.id
-    const headers = {
-      'Content-Type': 'application/json'
-    };
-    axios.post("http://localhost:3000/saved",{userid:userid,bookid:bookid},{headers})
+    const jv = {
+      userid:Number(userid),
+      bookid:Number(bookid)
+    } 
+    axios.post("http://localhost:3000/saved",jv)
     .then(req =>{
-      console.log(req.data);
+    if(req.data == 'bingo'){
     ctx.reply(`tabriklaymiz siz saqladingiz ✅`)
-    })      
+    }else{
+      ctx.reply('siz bu kitobni allaqachon saqlagansiz!')
+    }
+    })       
     .catch(error => {
-      console.log(error.data);
       console.log('error');
+      // if(error.response.data.statusCode == 401){
+      //   ctx.reply('avval registratsiyadan oting /registratsiya')
+      // }
     }) 
   }
   else{

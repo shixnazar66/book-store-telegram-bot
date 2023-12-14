@@ -180,17 +180,24 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
             ctx.reply('avval registratsiyadan oting /registratsiya');
         }
         const userid = finduser.data.id;
-        const headers = {
-            'Content-Type': 'application/json'
+        const jv = {
+            userid: Number(userid),
+            bookid: Number(bookid)
         };
-        axios_1.default.post("http://localhost:3000/saved", { userid: userid, bookid: bookid }, { headers })
+        axios_1.default.post("http://localhost:3000/saved", jv)
             .then(req => {
-            console.log(req.data);
-            ctx.reply(`tabriklaymiz siz saqladingiz ✅`);
+            if (req.data == 'bingo') {
+                ctx.reply(`tabriklaymiz siz saqladingiz ✅`);
+            }
+            else {
+                ctx.reply('siz bu kitobni allaqachon saqlagansiz!');
+            }
         })
             .catch(error => {
-            console.log(error.data);
             console.log('error');
+            // if(error.response.data.statusCode == 401){
+            //   ctx.reply('avval registratsiyadan oting /registratsiya')
+            // }
         });
     }
     else {
