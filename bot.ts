@@ -1,4 +1,4 @@
-import { Bot, InlineKeyboard, Keyboard, Context } from "grammy";
+import { Bot, InlineKeyboard, Keyboard, Context, InputFile } from "grammy";
 import * as grammy from "grammy";
 import {
    createConversation,
@@ -9,17 +9,18 @@ import {
 import { env } from "./config/env.config";
 import axios from "axios";
 import { channelGuard } from "./guards/channel-guard";
-
+import { registerguard } from "./guards/register-guard";
+ 
 
 const token = env.BOT_TOKEN;
 
 
-
+ 
 type MyContext = Context & ConversationFlavor;
 type MyConversation = Conversation<MyContext>;
 
-
 const bot = new Bot<MyContext>(token);
+
 
 
 bot.use(grammy.session({ initial: () => ({}) }));
@@ -76,42 +77,35 @@ export async function addQuestion(
 }
 
 
-bot.command("registratsiya", async (ctx) => {
-   const userID = ctx.from?.id
-   axios.get("http://localhost:3000/auth/telegram/"+userID)
-  .then(req => {
-   ctx.reply('siz allaqachon registratsiyadan otgansiz ✅')
-  })
-  .catch(error => {
-     ctx.conversation.enter('addquestion')
-  })
+bot.command("registratsiya",channelGuard, async (ctx) => {
+  const userID = ctx.from?.id
+  axios.get("http://localhost:3000/auth/telegram/"+userID)
+ .then(req => {
+  ctx.reply('siz allaqachon registratsiyadan otgansiz ✅')
+ })
+ .catch(error => {
+    ctx.conversation.enter('addquestion')
+ })
 })
 
 
 
 
-bot.command("start",channelGuard, async (ctx) => {
-     const userID = ctx.from?.id
-     axios.get("http://localhost:3000/auth/telegram/"+userID)
-    .then(req => {
-    ctx.reply(`welcome 👀
-      ------------------------------------------------------------   
-                     nima qilishni hohlaysiz?
-      ------------------------------------------------------------
+bot.command("start",channelGuard,registerguard, async (ctx) => {
+  ctx.reply(`welcome 👀
+  ------------------------------------------------------------   
+                 nima qilishni hohlaysiz?
+  ------------------------------------------------------------
 registratsiyadan otish uchun -> /registratsiya
 kitoblarni topish uchun -> /find
 categoryni topish uchun -> /category
-       ------------------------------------------------------------
-                                 omad ✅`)
-    })
-    .catch(error => {
-      ctx.reply('avval registratsiyadan oting /registratsiya')
-    })
+   ------------------------------------------------------------
+                             omad ✅`)
 });
 
+ 
 
-
-bot.command('me',async (ctx) => {
+bot.command('me',channelGuard,registerguard, async (ctx) => {
   const id = ctx.from?.id
   axios.get("http://localhost:3000/auth/saved/"+id)
   .then(req => {
@@ -129,7 +123,7 @@ money ° ${str.money} som`,
 }
   })
   .catch(error => { 
-     ctx.reply('siz xali hechnarsa saqlamagansiz ❌')
+    ctx.reply('siz xali hechnarsa saqlamagansiz ❌')
   })
 })
 
@@ -163,7 +157,7 @@ ctx.reply(`bunday kitob majvud emas ❌
 }
 
 
-bot.command('find',async (ctx) => {
+bot.command('find',channelGuard,registerguard, async (ctx) => {
   ctx.conversation.enter('findbook')
 })
  
@@ -177,6 +171,7 @@ bot.on('callback_query:data',async (ctx,next) => {
   axios.get("http://localhost:3000/book/buy/"+str)
   .then(req =>{
   ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`)
+  ctx.replyWithDocument(new InputFile('pdf/text.pdf'))
   })     
   .catch(error => {
     console.log('error');
@@ -195,8 +190,8 @@ bot.on('callback_query:data',async (ctx,next) => {
       bookid:Number(bookid)
     } 
     axios.post("http://localhost:3000/saved",jv)
-    .then(req =>{
-    if(req.data == 'bingo'){
+    .then(req =>{ 
+    if(req.data == 'bingo'){ 
     ctx.reply(`tabriklaymiz siz saqladingiz ✅`)
     }else{
       ctx.reply('siz bu kitobni allaqachon saqlagansiz!')
@@ -218,7 +213,7 @@ bot.on('callback_query:data',async (ctx,next) => {
 
 
 
-bot.command('category',async (ctx) => {
+bot.command('category',channelGuard,registerguard, async (ctx) => {
   try {
    const request = await axios.get("http://localhost:3000/category/findcategory")
    const jv:{categoryname:string}[] = request.data
@@ -262,32 +257,8 @@ money: ${obj.money} som`,{reply_markup:keyboard})
 
 
 
-// const str = ctx.callbackQuery.data
-// await axios.post("http://localhost:3000/category/findcat",{categoryname:str})
-// .then(req => {
-// const jv = req.data
-// for (let obj of jv.book){  
-// const keyboard = new InlineKeyboard()
-// .text('sotib olish 💸',`buy ${obj.id}`).row()
-// ctx.reply(`${str} (categoriyasidagi kitob)
- 
-// bookname: ${obj.bookname}
-// author: ${obj.author}
-// booklanguage: ${obj.booklanguage}
-// money: ${obj.money} som`,{reply_markup:keyboard})
-// }
-// })
-// .catch(error => {
-//   console.log(error); 
-//   ctx.reply('bunday categorya topilmadi ❌')
-//  })
 
-
-
-
-
-
-bot.command('help',async (ctx) => {
+bot.command('help',channelGuard,registerguard, async (ctx) => {
   ctx.reply(`  
                  nima qilishni hohlaysiz?
   ------------------------------------------------------------
@@ -300,17 +271,21 @@ saqlangan kitoblarni korish -> /me
 })
 
 
+bot.command("send",channelGuard,registerguard, async (ctx) => {
+  ctx.replyWithDocument(new InputFile(`pdf/text.pdf`))
+});
 
-bot.on('message', async (ctx) => {
+
+
+
+
+
+
+bot.on('message',channelGuard,registerguard, async (ctx) => {
   ctx.reply('bingo')
 })
 
 
-
-
-
-
-
-
+ 
 
 bot.start();
