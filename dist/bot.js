@@ -42,6 +42,7 @@ const conversations_1 = require("@grammyjs/conversations");
 const env_config_1 = require("./config/env.config");
 const axios_1 = __importDefault(require("axios"));
 const channel_guard_1 = require("./guards/channel-guard");
+const register_guard_1 = require("./guards/register-guard");
 const token = env_config_1.env.BOT_TOKEN;
 const bot = new grammy_1.Bot(token);
 bot.use(grammy.session({ initial: () => ({}) }));
@@ -82,7 +83,7 @@ function addQuestion(conversation, ctx) {
     });
 }
 exports.addQuestion = addQuestion;
-bot.command("registratsiya", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+bot.command("registratsiya", channel_guard_1.channelGuard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const userID = (_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id;
     axios_1.default.get("http://localhost:3000/auth/telegram/" + userID)
@@ -93,28 +94,20 @@ bot.command("registratsiya", (ctx) => __awaiter(void 0, void 0, void 0, function
         ctx.conversation.enter('addquestion');
     });
 }));
-bot.command("start", channel_guard_1.channelGuard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const userID = (_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id;
-    axios_1.default.get("http://localhost:3000/auth/telegram/" + userID)
-        .then(req => {
-        ctx.reply(`welcome 👀
-      ------------------------------------------------------------   
-                     nima qilishni hohlaysiz?
-      ------------------------------------------------------------
+bot.command("start", channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    ctx.reply(`welcome 👀
+  ------------------------------------------------------------   
+                 nima qilishni hohlaysiz?
+  ------------------------------------------------------------
 registratsiyadan otish uchun -> /registratsiya
 kitoblarni topish uchun -> /find
 categoryni topish uchun -> /category
-       ------------------------------------------------------------
-                                 omad ✅`);
-    })
-        .catch(error => {
-        ctx.reply('avval registratsiyadan oting /registratsiya');
-    });
+   ------------------------------------------------------------
+                             omad ✅`);
 }));
-bot.command('me', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    const id = (_c = ctx.from) === null || _c === void 0 ? void 0 : _c.id;
+bot.command('me', channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    const id = (_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id;
     axios_1.default.get("http://localhost:3000/auth/saved/" + id)
         .then(req => {
         const book = req.data;
@@ -157,7 +150,7 @@ money ° ${req.data.money} som
     });
 }
 exports.findbook = findbook;
-bot.command('find', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+bot.command('find', channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.conversation.enter('findbook');
 }));
 bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -167,6 +160,7 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
         axios_1.default.get("http://localhost:3000/book/buy/" + str)
             .then(req => {
             ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`);
+            ctx.replyWithDocument(new grammy_1.InputFile('pdf/text.pdf'));
         })
             .catch(error => {
             console.log('error');
@@ -204,7 +198,7 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
         next();
     }
 }));
-bot.command('category', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+bot.command('category', channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const request = yield axios_1.default.get("http://localhost:3000/category/findcategory");
         const jv = request.data;
@@ -245,25 +239,7 @@ money: ${obj.money} som`, { reply_markup: keyboard });
         ctx.reply('bunday categorya topilmadi ❌');
     }
 }));
-// const str = ctx.callbackQuery.data
-// await axios.post("http://localhost:3000/category/findcat",{categoryname:str})
-// .then(req => {
-// const jv = req.data
-// for (let obj of jv.book){  
-// const keyboard = new InlineKeyboard()
-// .text('sotib olish 💸',`buy ${obj.id}`).row()
-// ctx.reply(`${str} (categoriyasidagi kitob)
-// bookname: ${obj.bookname}
-// author: ${obj.author}
-// booklanguage: ${obj.booklanguage}
-// money: ${obj.money} som`,{reply_markup:keyboard})
-// }
-// })
-// .catch(error => {
-//   console.log(error); 
-//   ctx.reply('bunday categorya topilmadi ❌')
-//  })
-bot.command('help', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+bot.command('help', channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.reply(`  
                  nima qilishni hohlaysiz?
   ------------------------------------------------------------
@@ -274,7 +250,10 @@ saqlangan kitoblarni korish -> /me
    ------------------------------------------------------------
                              omad ✅`);
 }));
-bot.on('message', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+bot.command("send", channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    ctx.replyWithDocument(new grammy_1.InputFile(`pdf/text.pdf`));
+}));
+bot.on('message', channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.reply('bingo');
 }));
 bot.start();
