@@ -188,10 +188,9 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
             }
         })
             .catch(error => {
-            console.log('error');
-            // if(error.response.data.statusCode == 401){
-            //   ctx.reply('avval registratsiyadan oting /registratsiya')
-            // }
+            if (error.response.data.statusCode == 401) {
+                ctx.reply('token yoq');
+            }
         });
     }
     else {

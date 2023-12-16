@@ -103,7 +103,7 @@ categoryni topish uchun -> /category
                              omad ✅`)
 });
 
- 
+
 
 bot.command('me',channelGuard,registerguard, async (ctx) => {
   const id = ctx.from?.id
@@ -198,10 +198,9 @@ bot.on('callback_query:data',async (ctx,next) => {
     }
     })       
     .catch(error => {
-      console.log('error');
-      // if(error.response.data.statusCode == 401){
-      //   ctx.reply('avval registratsiyadan oting /registratsiya')
-      // }
+      if(error.response.data.statusCode == 401){
+        ctx.reply('token yoq')
+      }
     }) 
   }
   else{
