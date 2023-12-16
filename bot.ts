@@ -10,12 +10,12 @@ import { env } from "./config/env.config";
 import axios from "axios";
 import { channelGuard } from "./guards/channel-guard";
 import { registerguard } from "./guards/register-guard";
-
+ 
 
 const token = env.BOT_TOKEN;
 
 
-
+ 
 type MyContext = Context & ConversationFlavor;
 type MyConversation = Conversation<MyContext>;
 
@@ -103,7 +103,7 @@ categoryni topish uchun -> /category
                              omad ✅`)
 });
 
-
+ 
 
 bot.command('me',channelGuard,registerguard, async (ctx) => {
   const id = ctx.from?.id
@@ -118,12 +118,12 @@ ctx.reply(`sizning saqlagan kitobingiz ✅
 bookname ° ${str.bookname}
 author ° ${str.author}
 booklanguage ° ${str.booklanguage}
-money ° ${str.money} som`,
+money ° ${str.money} som`, 
 {reply_markup:keyboard})
 }
-  })
+  })  
   .catch(error => { 
-  ctx.reply('siz xali hechnarsa saqlamagansiz ❌')
+    ctx.reply('siz xali hechnarsa saqlamagansiz ❌')
   })
 })
 

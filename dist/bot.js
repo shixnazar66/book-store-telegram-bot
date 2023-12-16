@@ -154,7 +154,8 @@ bot.command('find', channel_guard_1.channelGuard, register_guard_1.registerguard
     ctx.conversation.enter('findbook');
 }));
 bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const arr = ctx.callbackQuery.data;
+    var _c;
+    const arr = (_c = ctx.callbackQuery) === null || _c === void 0 ? void 0 : _c.data;
     if (arr.split(" ")[0] == 'buy') {
         const str = arr.split(" ")[1];
         axios_1.default.get("http://localhost:3000/book/buy/" + str)
@@ -214,8 +215,9 @@ bot.command('category', channel_guard_1.channelGuard, register_guard_1.registerg
     }
 }));
 bot.on('callback_query:data', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    var _d;
     try {
-        const str = ctx.callbackQuery.data;
+        const str = (_d = ctx.callbackQuery) === null || _d === void 0 ? void 0 : _d.data;
         const req = yield axios_1.default.post("http://localhost:3000/category/findcat", { categoryname: str });
         const jv = req.data;
         if (jv.book.length <= 0) {
