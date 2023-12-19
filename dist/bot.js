@@ -159,8 +159,13 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
         const str = arr.split(" ")[1];
         axios_1.default.get("http://localhost:3000/book/buy/" + str)
             .then(req => {
-            ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`);
-            ctx.replyWithDocument(new grammy_1.InputFile(`${req.data.pdf}`));
+            if (req.data.pdf != null) {
+                ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`);
+                ctx.replyWithDocument(new grammy_1.InputFile(`${req.data.pdf}`));
+            }
+            else {
+                ctx.reply('bu kitobning pdf varianti yoq ❌');
+            }
         })
             .catch(error => {
             console.log('error');

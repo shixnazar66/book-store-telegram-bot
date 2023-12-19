@@ -170,8 +170,12 @@ bot.on('callback_query:data',async (ctx,next) => {
   const str = arr.split(" ")[1]
   axios.get("http://localhost:3000/book/buy/"+str)
   .then(req =>{
+  if(req.data.pdf != null){
   ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`)
   ctx.replyWithDocument(new InputFile(`${req.data.pdf}`))
+  }else{
+    ctx.reply('bu kitobning pdf varianti yoq ❌')
+  }
   })     
   .catch(error => {
     console.log('error');
