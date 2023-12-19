@@ -160,7 +160,7 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
         axios_1.default.get("http://localhost:3000/book/buy/" + str)
             .then(req => {
             ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`);
-            ctx.replyWithDocument(new grammy_1.InputFile('pdf/text.pdf'));
+            ctx.replyWithDocument(new grammy_1.InputFile(`${req.data.pdf}`));
         })
             .catch(error => {
             console.log('error');
@@ -188,9 +188,7 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
             }
         })
             .catch(error => {
-            if (error.response.data.statusCode == 401) {
-                ctx.reply('token yoq');
-            }
+            console.log(error);
         });
     }
     else {

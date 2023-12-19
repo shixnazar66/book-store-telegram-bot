@@ -171,7 +171,7 @@ bot.on('callback_query:data',async (ctx,next) => {
   axios.get("http://localhost:3000/book/buy/"+str)
   .then(req =>{
   ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`)
-  ctx.replyWithDocument(new InputFile('pdf/text.pdf'))
+  ctx.replyWithDocument(new InputFile(`${req.data.pdf}`))
   })     
   .catch(error => {
     console.log('error');
@@ -198,9 +198,7 @@ bot.on('callback_query:data',async (ctx,next) => {
     }
     })       
     .catch(error => {
-      if(error.response.data.statusCode == 401){
-        ctx.reply('token yoq')
-      }
+      console.log(error);
     }) 
   }
   else{
