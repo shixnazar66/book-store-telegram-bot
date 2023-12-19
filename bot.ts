@@ -174,7 +174,7 @@ bot.on('callback_query:data',async (ctx,next) => {
   ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`)
   ctx.replyWithDocument(new InputFile(`${req.data.pdf}`))
   }else{
-    ctx.reply('bu kitobning pdf varianti yoq ❌')
+  ctx.reply(`${req.data.bookname} kitobining PDF varianti yoq ❌`)
   }
   })     
   .catch(error => {

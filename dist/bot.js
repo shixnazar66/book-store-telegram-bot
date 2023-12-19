@@ -164,7 +164,7 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
                 ctx.replyWithDocument(new grammy_1.InputFile(`${req.data.pdf}`));
             }
             else {
-                ctx.reply('bu kitobning pdf varianti yoq ❌');
+                ctx.reply(`${req.data.bookname} kitobining PDF varianti yoq ❌`);
             }
         })
             .catch(error => {
