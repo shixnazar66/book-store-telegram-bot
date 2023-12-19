@@ -252,9 +252,6 @@ saqlangan kitoblarni korish -> /me
    ------------------------------------------------------------
                              omad ✅`);
 }));
-bot.command("send", channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    ctx.replyWithDocument(new grammy_1.InputFile(`pdf/text.pdf`));
-}));
 bot.on('message', channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.reply('bingo');
 }));

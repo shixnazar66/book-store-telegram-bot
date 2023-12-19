@@ -162,7 +162,7 @@ bot.command('find',channelGuard,registerguard, async (ctx) => {
 })
  
 
-
+ 
 
 bot.on('callback_query:data',async (ctx,next) => {
   const arr = ctx.callbackQuery.data
@@ -270,11 +270,6 @@ saqlangan kitoblarni korish -> /me
    ------------------------------------------------------------
                              omad ✅`)
 })
-
-
-bot.command("send",channelGuard,registerguard, async (ctx) => {
-  ctx.replyWithDocument(new InputFile(`pdf/text.pdf`))
-});
 
 
 
