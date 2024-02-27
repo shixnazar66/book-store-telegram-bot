@@ -243,17 +243,17 @@ for (let obj of jv.book){
 const keyboard = new InlineKeyboard()
 .text('sotib olish 💸',`buy ${obj.id}`).text('saqlash ✅',`save ${obj.id}`).row()
 ctx.reply(`${str} (categoriyasidagi kitob)
- 
+
 bookname: ${obj.bookname}
 author: ${obj.author}
 booklanguage: ${obj.booklanguage}
 money: ${obj.money} som`,{reply_markup:keyboard})
 }
  }
-  } catch (error) {
-    console.log(error); 
-  ctx.reply('bunday categorya topilmadi ❌')
-  }
+}catch (error) {
+console.log(error); 
+ctx.reply('bunday categorya topilmadi ❌')
+}
 })
 
 
@@ -272,8 +272,10 @@ saqlangan kitoblarni korish -> /me
 })
 
 
-
-
+bot.command('send',async (ctx) => {
+  ctx.replyWithDocument(new InputFile('pdf/ahmad_lutfiy_qozonchi_qaynona_roman15.pdf',"new book.pdf"))
+})
+ 
 
 
 

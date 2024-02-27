@@ -228,7 +228,7 @@ bot.on('callback_query:data', (ctx) => __awaiter(void 0, void 0, void 0, functio
                 const keyboard = new grammy_1.InlineKeyboard()
                     .text('sotib olish 💸', `buy ${obj.id}`).text('saqlash ✅', `save ${obj.id}`).row();
                 ctx.reply(`${str} (categoriyasidagi kitob)
- 
+
 bookname: ${obj.bookname}
 author: ${obj.author}
 booklanguage: ${obj.booklanguage}
@@ -251,6 +251,9 @@ categoryni topish uchun -> /category
 saqlangan kitoblarni korish -> /me
    ------------------------------------------------------------
                              omad ✅`);
+}));
+bot.command('send', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    ctx.replyWithDocument(new grammy_1.InputFile('pdf/ahmad_lutfiy_qozonchi_qaynona_roman15.pdf', "new book.pdf"));
 }));
 bot.on('message', channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.reply('bingo');
