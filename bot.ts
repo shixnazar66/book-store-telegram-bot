@@ -64,7 +64,7 @@ export async function addQuestion(
    'Content-Type': 'application/json'
  };
 
-  await axios.put("http://localhost:3000/auth/register",jv,{headers})
+  await axios.put("http://localhost:3001/auth/register",jv,{headers})
   .then(req => {
    ctx.reply('registratsiyadan otdingiz tabriklayman ✅')
   })
@@ -79,7 +79,7 @@ export async function addQuestion(
 
 bot.command("registratsiya",channelGuard, async (ctx) => {
   const userID = ctx.from?.id
-  axios.get("http://localhost:3000/auth/telegram/"+userID)
+  axios.get("http://localhost:3001/auth/telegram/"+userID)
  .then(req => {
   ctx.reply('siz allaqachon registratsiyadan otgansiz ✅')
  })
@@ -107,7 +107,7 @@ categoryni topish uchun -> /category
 
 bot.command('me',channelGuard,registerguard, async (ctx) => {
   const id = ctx.from?.id
-  axios.get("http://localhost:3000/auth/saved/"+id)
+  axios.get("http://localhost:3001/auth/saved/"+id)
   .then(req => {
 const book = req.data
 for (let str of book){
@@ -137,7 +137,7 @@ export async function findbook(
 ) {
   ctx.reply("kitob nomini yozing ✒️");
   const kitob = await conversation.form.text();
- axios.put("http://localhost:3000/book/bookfind",{bookname:kitob})
+ axios.put("http://localhost:3001/book/bookfind",{bookname:kitob})
 .then(req => {
 const keyboard = new InlineKeyboard()
 .text('sotib olish 💸',`buy ${req.data.id}`).text('saqlash ✅',`save ${req.data.id}`).row()
@@ -168,7 +168,7 @@ bot.on('callback_query:data',async (ctx,next) => {
   const arr = ctx.callbackQuery.data
   if(arr.split(" ")[0] == 'buy'){
   const str = arr.split(" ")[1]
-  axios.get("http://localhost:3000/book/buy/"+str)
+  axios.get("http://localhost:3001/book/buy/"+str)
   .then(req =>{
   if(req.data.pdf != null){
   ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`)
@@ -193,7 +193,7 @@ bot.on('callback_query:data',async (ctx,next) => {
       userid:Number(userid),
       bookid:Number(bookid)
     } 
-    axios.post("http://localhost:3000/saved",jv)
+    axios.post("http://localhost:3001/saved",jv)
     .then(req =>{ 
     if(req.data == 'bingo'){ 
     ctx.reply(`tabriklaymiz siz saqladingiz ✅`)
@@ -216,7 +216,7 @@ bot.on('callback_query:data',async (ctx,next) => {
 
 bot.command('category',channelGuard,registerguard, async (ctx) => {
   try {
-   const request = await axios.get("http://localhost:3000/category/findcategory")
+   const request = await axios.get("http://localhost:3001/category/findcategory")
    const jv:{categoryname:string}[] = request.data
    const names: string[] = jv.map(obj => obj.categoryname);
    const keyboard = new InlineKeyboard()
@@ -234,7 +234,7 @@ bot.command('category',channelGuard,registerguard, async (ctx) => {
 bot.on('callback_query:data',async (ctx) => {
 try {
 const str = ctx.callbackQuery.data
-const req = await axios.post("http://localhost:3000/category/findcat",{categoryname:str})
+const req = await axios.post("http://localhost:3001/category/findcat",{categoryname:str})
 const jv = req.data
 if(jv.book.length <= 0){
   ctx.reply(`(${jv.categoryname}) categorysida kitoblar mavjud emas ❌`)

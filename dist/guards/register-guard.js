@@ -18,7 +18,7 @@ function registerguard(ctx, next) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const userid = (_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id;
-        yield axios_1.default.get("http://localhost:3000/auth/telegram/" + userid)
+        yield axios_1.default.get("http://localhost:3001/auth/telegram/" + userid)
             .then(req => {
             next();
         })

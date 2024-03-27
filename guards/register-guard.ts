@@ -8,7 +8,7 @@ type MyConversation = Conversation<MyContext>;
 
 export async function registerguard(ctx: MyContext, next: NextFunction) {
 const userid = ctx.from?.id
-await axios.get("http://localhost:3000/auth/telegram/"+userid)
+await axios.get("http://localhost:3001/auth/telegram/"+userid)
 .then(req => {
 next()  
 })

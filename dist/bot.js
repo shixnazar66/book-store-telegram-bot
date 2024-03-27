@@ -70,7 +70,7 @@ function addQuestion(conversation, ctx) {
         const headers = {
             'Content-Type': 'application/json'
         };
-        yield axios_1.default.put("http://localhost:3000/auth/register", jv, { headers })
+        yield axios_1.default.put("http://localhost:3001/auth/register", jv, { headers })
             .then(req => {
             ctx.reply('registratsiyadan otdingiz tabriklayman ✅');
         })
@@ -86,7 +86,7 @@ exports.addQuestion = addQuestion;
 bot.command("registratsiya", channel_guard_1.channelGuard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const userID = (_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id;
-    axios_1.default.get("http://localhost:3000/auth/telegram/" + userID)
+    axios_1.default.get("http://localhost:3001/auth/telegram/" + userID)
         .then(req => {
         ctx.reply('siz allaqachon registratsiyadan otgansiz ✅');
     })
@@ -108,7 +108,7 @@ categoryni topish uchun -> /category
 bot.command('me', channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     var _b;
     const id = (_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id;
-    axios_1.default.get("http://localhost:3000/auth/saved/" + id)
+    axios_1.default.get("http://localhost:3001/auth/saved/" + id)
         .then(req => {
         const book = req.data;
         for (let str of book) {
@@ -131,7 +131,7 @@ function findbook(conversation, ctx) {
     return __awaiter(this, void 0, void 0, function* () {
         ctx.reply("kitob nomini yozing ✒️");
         const kitob = yield conversation.form.text();
-        axios_1.default.put("http://localhost:3000/book/bookfind", { bookname: kitob })
+        axios_1.default.put("http://localhost:3001/book/bookfind", { bookname: kitob })
             .then(req => {
             const keyboard = new grammy_1.InlineKeyboard()
                 .text('sotib olish 💸', `buy ${req.data.id}`).text('saqlash ✅', `save ${req.data.id}`).row();
@@ -157,7 +157,7 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
     const arr = ctx.callbackQuery.data;
     if (arr.split(" ")[0] == 'buy') {
         const str = arr.split(" ")[1];
-        axios_1.default.get("http://localhost:3000/book/buy/" + str)
+        axios_1.default.get("http://localhost:3001/book/buy/" + str)
             .then(req => {
             if (req.data.pdf != null) {
                 ctx.reply(`tabriklaymiz siz (${req.data.bookname}) kitobini sotib oldingiz ✅`);
@@ -183,7 +183,7 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
             userid: Number(userid),
             bookid: Number(bookid)
         };
-        axios_1.default.post("http://localhost:3000/saved", jv)
+        axios_1.default.post("http://localhost:3001/saved", jv)
             .then(req => {
             if (req.data == 'bingo') {
                 ctx.reply(`tabriklaymiz siz saqladingiz ✅`);
@@ -202,7 +202,7 @@ bot.on('callback_query:data', (ctx, next) => __awaiter(void 0, void 0, void 0, f
 }));
 bot.command('category', channel_guard_1.channelGuard, register_guard_1.registerguard, (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const request = yield axios_1.default.get("http://localhost:3000/category/findcategory");
+        const request = yield axios_1.default.get("http://localhost:3001/category/findcategory");
         const jv = request.data;
         const names = jv.map(obj => obj.categoryname);
         const keyboard = new grammy_1.InlineKeyboard();
@@ -218,7 +218,7 @@ bot.command('category', channel_guard_1.channelGuard, register_guard_1.registerg
 bot.on('callback_query:data', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const str = ctx.callbackQuery.data;
-        const req = yield axios_1.default.post("http://localhost:3000/category/findcat", { categoryname: str });
+        const req = yield axios_1.default.post("http://localhost:3001/category/findcat", { categoryname: str });
         const jv = req.data;
         if (jv.book.length <= 0) {
             ctx.reply(`(${jv.categoryname}) categorysida kitoblar mavjud emas ❌`);
